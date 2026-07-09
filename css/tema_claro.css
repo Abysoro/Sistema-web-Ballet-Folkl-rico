@@ -1,0 +1,416 @@
+/* =========================================================
+   TEMA CLARO PREMIUM - MENOS BLANCO Y MAYOR CONTRASTE
+   Pegar al final de tema_claro.css
+========================================================= */
+
+body.modo-claro {
+  --bg-deep:        #e7eef5;
+  --bg-panel:       #eef5fa;
+  --bg-card:        #f7fbfd;
+  --bg-card-hover:  #eaf4f8;
+
+  --border-dim:     #b9ccd9;
+  --border-neon:    #159bb1;
+
+  --neon-cyan:      #048aa0;
+  --neon-blue:      #0f6f93;
+  --neon-purple:    #7b5e9e;
+
+  --text-primary:   #102638;
+  --text-secondary: #38566e;
+  --text-muted:     #667d90;
+
+  --shadow-card: 0 12px 28px rgba(27, 58, 82, 0.16);
+  --shadow-neon: 0 0 16px rgba(4, 138, 160, 0.18);
+
+  background-color: var(--bg-deep) !important;
+
+  background-image:
+    radial-gradient(circle at top left, rgba(4,138,160,0.10), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(225,21,114,0.06), transparent 30%),
+    linear-gradient(rgba(40,75,100,0.065) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(40,75,100,0.065) 1px, transparent 1px) !important;
+
+  background-size: auto, auto, 38px 38px, 38px 38px !important;
+  color: var(--text-primary) !important;
+}
+
+/* HEADER MÁS DEFINIDO */
+body.modo-claro header {
+  background: linear-gradient(135deg, #dcebf3 0%, #f5f9fc 55%, #d4e8f1 100%) !important;
+  border-bottom: 1px solid #9fc0cf !important;
+  box-shadow: 0 8px 22px rgba(35, 70, 95, 0.10) !important;
+}
+
+body.modo-claro header h1 {
+  color: #075f72 !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.75) !important;
+}
+
+body.modo-claro header p {
+  color: #38566e !important;
+  font-weight: 800 !important;
+}
+
+body.modo-claro .logo {
+  filter:
+    drop-shadow(0 0 5px rgba(4, 138, 160, 0.28))
+    contrast(1.08)
+    saturate(1.12) !important;
+}
+
+/* SIDEBAR MÁS VISIBLE */
+body.modo-claro .sidebar {
+  background: linear-gradient(180deg, #f4f9fc 0%, #dfeef5 100%) !important;
+  border-right: 1px solid #abc5d4 !important;
+  box-shadow: 8px 0 22px rgba(31, 49, 66, 0.13) !important;
+}
+
+body.modo-claro .sidebar-menu a {
+  color: #415a70 !important;
+}
+
+body.modo-claro .sidebar-menu a:hover,
+body.modo-claro .sidebar-menu a.active {
+  background: rgba(4, 138, 160, 0.13) !important;
+  color: #045f72 !important;
+}
+
+/* PANELES PRINCIPALES: YA NO BLANCO PURO */
+body.modo-claro .panel-formulario,
+body.modo-claro .panel-tabla,
+body.modo-claro .seccion-tabla-unica,
+body.modo-claro .panel-dashboard,
+body.modo-claro .estado-actual-dashboard .bloque-dashboard,
+body.modo-claro .contenedor-asignacion .panel-formulario,
+body.modo-claro .contenedor-asignacion .panel-tabla,
+body.modo-claro main.contenedor > section.card,
+body.modo-claro section:not(.contenedor-principal):not(.contenedor-asignacion):not(.seccion-tabla-unica):not(.panel-acciones):not(.panel-tabla) {
+  background: linear-gradient(180deg, #f7fbfd 0%, #e6f1f7 100%) !important;
+  border: 1px solid #b6cdd9 !important;
+  border-top: 3px solid #069cb4 !important;
+  box-shadow:
+    0 14px 32px rgba(32, 67, 92, 0.16),
+    inset 0 1px 0 rgba(255,255,255,0.85) !important;
+}
+
+/* TÍTULOS MÁS FUERTES */
+body.modo-claro h2,
+body.modo-claro h3,
+body.modo-claro .panel-dashboard h2,
+body.modo-claro .estado-actual-dashboard .bloque-dashboard h2,
+body.modo-claro section h2 {
+  color: #03677b !important;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.7) !important;
+  font-weight: 950 !important;
+}
+
+/* TARJETAS INTERNAS CON CONTRASTE */
+body.modo-claro .tarjeta-resumen,
+body.modo-claro .item-estado,
+body.modo-claro .aviso,
+body.modo-claro .detalle-item {
+  background: linear-gradient(180deg, #ffffff 0%, #edf5f9 100%) !important;
+  border: 1px solid #bfd3df !important;
+  box-shadow:
+    0 8px 18px rgba(38, 75, 102, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+body.modo-claro .tarjeta-resumen h3,
+body.modo-claro .item-estado .etiqueta,
+body.modo-claro .detalle-item .label {
+  color: #3b6078 !important;
+  font-weight: 900 !important;
+}
+
+body.modo-claro .tarjeta-resumen p,
+body.modo-claro .item-estado strong,
+body.modo-claro .detalle-total strong {
+  color: #03677b !important;
+  font-weight: 950 !important;
+}
+
+body.modo-claro .tarjeta-resumen span,
+body.modo-claro .aviso p,
+body.modo-claro .detalle-persona p,
+body.modo-claro .detalle-total span {
+  color: #48677c !important;
+}
+
+/* AVISOS MÁS LEGIBLES */
+body.modo-claro .aviso {
+  background: #f7fbfd !important;
+}
+
+body.modo-claro .aviso strong {
+  color: #102638 !important;
+  font-weight: 950 !important;
+}
+
+/* TABLAS CON MÁS DIFERENCIA */
+body.modo-claro .tabla-scroll,
+body.modo-claro .tabla-responsive,
+body.modo-claro .seccion-tabla-unica .tabla-scroll {
+  background: #eef6fa !important;
+  border: 1px solid #acc7d6 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55) !important;
+}
+
+body.modo-claro thead,
+body.modo-claro .seccion-tabla-unica .tabla-detalle-asignacion th {
+  background: linear-gradient(90deg, #0b879b 0%, #10abc0 100%) !important;
+}
+
+body.modo-claro th,
+body.modo-claro thead td {
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255,255,255,0.22) !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.25) !important;
+  font-weight: 950 !important;
+}
+
+body.modo-claro td {
+  color: #102638 !important;
+  border-bottom: 1px solid rgba(33,72,98,0.10) !important;
+  font-weight: 800 !important;
+}
+
+body.modo-claro tr:nth-child(odd) td {
+  background: #f3f8fb !important;
+}
+
+body.modo-claro tr:nth-child(even) td {
+  background: #e4f0f6 !important;
+}
+
+body.modo-claro tr:hover td {
+  background: #d4eaf3 !important;
+}
+
+/* FORMULARIOS */
+body.modo-claro label {
+  color: #31546c !important;
+  font-weight: 900 !important;
+}
+
+body.modo-claro input,
+body.modo-claro select,
+body.modo-claro textarea {
+  background: #f8fcfe !important;
+  color: #102638 !important;
+  border: 1px solid #a9c5d4 !important;
+  box-shadow: inset 0 1px 2px rgba(31,49,66,0.05) !important;
+}
+
+body.modo-claro input::placeholder,
+body.modo-claro textarea::placeholder {
+  color: #6f8799 !important;
+}
+
+body.modo-claro input:focus,
+body.modo-claro select:focus,
+body.modo-claro textarea:focus {
+  border-color: #069cb4 !important;
+  box-shadow:
+    0 0 0 4px rgba(6,156,180,0.14),
+    inset 0 1px 2px rgba(31,49,66,0.04) !important;
+}
+
+/* BOTONES */
+body.modo-claro button,
+body.modo-claro .btn-detalle,
+body.modo-claro .btn-resumen {
+  background: linear-gradient(180deg, #f9fdff 0%, #e4f3f8 100%) !important;
+  color: #05677b !important;
+  border: 1px solid #65b8c8 !important;
+  box-shadow: 0 8px 18px rgba(4,138,160,0.14) !important;
+  font-weight: 950 !important;
+}
+
+body.modo-claro button:hover,
+body.modo-claro .btn-detalle:hover,
+body.modo-claro .btn-resumen:hover {
+  background: rgba(6, 156, 180, 0.12) !important;
+  color: #05677b !important;
+  border-color: #069cb4 !important;
+  box-shadow: 0 0 14px rgba(6, 156, 180, 0.16) !important;
+}
+/* BOTÓN CERRAR SESIÓN MÁS VISIBLE */
+body.modo-claro .btn-logout {
+  color: #b01858 !important;
+  border-color: rgba(225, 21, 114, 0.55) !important;
+  background: rgba(225, 21, 114, 0.06) !important;
+}
+
+body.modo-claro .btn-logout:hover {
+  background: #e11572 !important;
+  color: #ffffff !important;
+}
+
+/* ESTADOS */
+body.modo-claro .estado-espera,
+body.modo-claro .tiempo-pendiente,
+body.modo-claro .tiempo-alto {
+  color: #d60045 !important;
+  font-weight: 950 !important;
+}
+
+body.modo-claro .estado-asignado,
+body.modo-claro .tiempo-ok,
+body.modo-claro .tiempo-bajo {
+  color: #008a4e !important;
+  font-weight: 950 !important;
+}
+
+body.modo-claro .tiempo-medio {
+  color: #b87900 !important;
+  font-weight: 950 !important;
+}
+
+/* MODALES */
+body.modo-claro .modal-contenido {
+  background: linear-gradient(180deg, #f8fcfe 0%, #e7f2f7 100%) !important;
+  border: 1px solid #acc7d6 !important;
+  border-top: 3px solid #069cb4 !important;
+  box-shadow: 0 16px 38px rgba(31,49,66,0.20) !important;
+}
+
+/* CATEGORÍAS EN MODO CLARO: MÁS VISIBLES */
+body.modo-claro .categoria-badge.categoria-ninos {
+  color: #776f00 !important;
+}
+
+body.modo-claro .categoria-badge.categoria-aspirantes {
+  color: #d90057 !important;
+}
+
+body.modo-claro .categoria-badge.categoria-juveniles {
+  color: #bce843 !important;
+}
+
+body.modo-claro .categoria-badge.categoria-elenco-oficial {
+  color: #8b3fa0 !important;
+}
+
+body.modo-claro .categoria-badge {
+  -webkit-text-stroke: 0.35px #111 !important;
+ 
+}
+
+
+/* =========================================================
+   LOGO MÁS PEQUEÑO SOLO EN MODO CLARO
+========================================================= */
+
+body.modo-claro header {
+  min-height: 160px !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+
+
+body.modo-claro .logo {
+  width: 95px !important;
+  height: auto !important;
+  margin-left: 50px !important;
+  object-fit: contain !important;
+}
+
+/* =========================================================
+   MODO CLARO - DETALLE DE EVALUACIÓN
+   Corrección directa para .valor y #contenidoDetalleModal
+========================================================= */
+
+body.modo-claro .swal2-popup {
+  background: linear-gradient(180deg, #f8fcfe 0%, #e8f3f8 100%) !important;
+  color: #17364b !important;
+  border: 1px solid #9fc7d8 !important;
+  border-top: 3px solid #08b8c9 !important;
+}
+
+body.modo-claro .swal2-title {
+  color: #075f72 !important;
+  font-weight: 950 !important;
+}
+
+/* Contenedor principal del detalle */
+body.modo-claro #contenidoDetalleModal,
+body.modo-claro #contenidoDetalleModal * {
+  color: #17364b !important;
+  text-shadow: none !important;
+}
+
+/* Título superior */
+body.modo-claro #contenidoDetalleModal .modal-title,
+body.modo-claro #contenidoDetalleModal h1,
+body.modo-claro #contenidoDetalleModal h2,
+body.modo-claro #contenidoDetalleModal h3 {
+  color: #075f72 !important;
+  font-weight: 950 !important;
+}
+
+/* Etiquetas: NIVEL, PUNTAJE RAPIDEZ, FECHA, MOTIVO */
+body.modo-claro #contenidoDetalleModal .label {
+  color: #365d76 !important;
+  font-weight: 950 !important;
+  letter-spacing: 0.06em !important;
+}
+
+/* Valores: Básico, 20.00, 12.00, 2026..., etc. */
+body.modo-claro #contenidoDetalleModal .valor {
+  color: #17364b !important;
+  font-weight: 850 !important;
+}
+
+/* Todo lo que esté dentro de valor */
+body.modo-claro #contenidoDetalleModal .valor *,
+body.modo-claro #contenidoDetalleModal .valor div,
+body.modo-claro #contenidoDetalleModal .valor span,
+body.modo-claro #contenidoDetalleModal .valor strong,
+body.modo-claro #contenidoDetalleModal .valor p {
+  color: #17364b !important;
+  font-weight: 850 !important;
+}
+
+/* Cajas internas */
+body.modo-claro #contenidoDetalleModal .detalle-item {
+  background: linear-gradient(180deg, #ffffff 0%, #edf6fa 100%) !important;
+  border: 1px solid #b6d1de !important;
+  box-shadow: 0 8px 18px rgba(32, 67, 92, 0.08) !important;
+}
+
+/* Caja grande del motivo */
+body.modo-claro #contenidoDetalleModal .detalle-item.full {
+  background: linear-gradient(180deg, #ffffff 0%, #eef7fb 100%) !important;
+  border: 1px solid #b6d1de !important;
+}
+
+/* Decisión final asignado */
+body.modo-claro #contenidoDetalleModal .estado-asignado,
+body.modo-claro #contenidoDetalleModal .asignado,
+body.modo-claro #contenidoDetalleModal [class*="asignado"] {
+  color: #008f4f !important;
+  font-weight: 950 !important;
+}
+
+/* En espera */
+body.modo-claro #contenidoDetalleModal .estado-espera,
+body.modo-claro #contenidoDetalleModal .en-espera,
+body.modo-claro #contenidoDetalleModal [class*="espera"] {
+  color: #e11572 !important;
+  font-weight: 950 !important;
+}
+
+/* Scroll del modal */
+body.modo-claro #contenidoDetalleModal::-webkit-scrollbar-thumb,
+body.modo-claro .swal2-html-container::-webkit-scrollbar-thumb {
+  background: #08b8c9 !important;
+}
+
+/* Botón cerrar X */
+body.modo-claro .swal2-close {
+  color: #075f72 !important;
+  background: #eef8fb !important;
+  border: 1px solid #8fc4d4 !important;
+}

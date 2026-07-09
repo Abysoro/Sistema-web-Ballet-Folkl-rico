@@ -1,0 +1,97 @@
+/* =========================================================
+   SOLICITAR NUEVA CUENTA - CENTRADO CON LOGO
+========================================================= */
+
+.solicitud-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+}
+
+.solicitud-contenedor {
+  width: 100%;
+  min-height: calc(100vh - 64px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solicitud-panel {
+  width: 100%;
+  max-width: 560px;
+  padding: 34px 40px 42px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.solicitud-logo-box {
+  width: 140px;
+  height: 120px;
+  margin: 0 auto 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solicitud-logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 14px rgba(0, 223, 252, 0.28));
+}
+
+.solicitud-panel form {
+  width: 100%;
+}
+
+.solicitud-panel h3 {
+  margin-top: 0;
+  margin-bottom: 34px;
+  text-align: center;
+}
+
+.solicitud-panel input {
+  width: 100%;
+}
+
+.solicitud-panel button {
+  width: 100%;
+  margin-top: 18px;
+}
+
+.solicitud-panel .login-link {
+  text-align: center;
+  margin-top: 26px;
+}
+
+/* responsive */
+@media (max-width: 620px) {
+  .solicitud-page {
+    padding: 20px 14px;
+  }
+
+  .solicitud-panel {
+    max-width: 100%;
+    padding: 28px 24px 34px;
+  }
+
+  .solicitud-logo-box {
+    width: 120px;
+    height: 105px;
+  }
+
+  .solicitud-logo {
+    width: 112px;
+  }
+
+  .solicitud-panel h3 {
+    font-size: 2rem;
+  }
+}

@@ -1,0 +1,224 @@
+.contenedor-evaluacion {
+    width: 100%;
+    max-width: none;
+    margin: 25px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.panel-acciones {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.panel-acciones button {
+    background: #111;
+    color: white;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.panel-acciones button:hover {
+    background: #333;
+}
+
+.panel-tabla {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.panel-tabla h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    text-align: center;
+    color: #1f3c63;
+}
+
+.filtro-categoria {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.filtro-categoria label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1f3c63;
+}
+
+.filtro-categoria select {
+    width: 350px;
+    max-width: 100%;
+    padding: 12px 15px;
+    font-size: 18px;
+    border: 2px solid #53c5c7;
+    border-radius: 10px;
+    background: white;
+    color: #111;
+    outline: none;
+    cursor: pointer;
+}
+
+.filtro-categoria select:focus {
+    border-color: #2f9fa1;
+    box-shadow: 0 0 6px rgba(83, 197, 199, 0.35);
+}
+
+.tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.tabla-responsive table {
+    width: 100%;
+    min-width: 1200px;
+    border-collapse: collapse;
+}
+
+#tablaResultados {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1400px;
+}
+
+#tablaResultados thead {
+    background: #5da5a9;
+}
+
+#tablaResultados th,
+#tablaResultados td {
+    border: 1px solid #d9d9d9;
+    padding: 12px 10px;
+    text-align: center;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+#tablaResultados tbody tr:nth-child(even) {
+    background: #dce7f0;
+}
+
+#tablaResultados tbody tr:nth-child(odd) {
+    background: #ffffff;
+}
+
+#tablaResultados tbody tr:hover {
+    background: #cfe0ee;
+}
+
+@media (max-width: 768px) {
+    .filtro-categoria {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filtro-categoria label {
+        text-align: center;
+    }
+
+    .filtro-categoria select {
+        width: 100%;
+    }
+
+    #tablaResultados th,
+    #tablaResultados td {
+        font-size: 13px;
+        padding: 8px 6px;
+    }
+}
+
+.filtro-categoria {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.filtro-categoria label {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1f3c63;
+}
+
+.filtro-categoria select {
+    width: 410px;
+    max-width: 100%;
+    padding: 12px 15px;
+    font-size: 18px;
+    border: 2px solid #53c5c7;
+    border-radius: 10px;
+    background: white;
+    color: #111;
+    outline: none;
+    cursor: pointer;
+}
+
+.filtro-categoria select:focus {
+    border-color: #2f9fa1;
+    box-shadow: 0 0 6px rgba(83, 197, 199, 0.35);
+}
+
+main.contenedor-evaluacion {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 40px 20px;
+    box-sizing: border-box;
+}
+
+.contenedor-evaluacion .panel-acciones,
+.contenedor-evaluacion .panel-tabla {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 0 25px 0 !important;
+}
+
+.contenedor-evaluacion .panel-tabla {
+    border-top: 6px solid #5BC0BE;
+}
+
+.contenedor-evaluacion .tabla-responsive {
+    width: 100%;
+    overflow-x: auto;
+}
+
+#tablaResultados {
+    width: 100%;
+    min-width: 1500px;
+    border-collapse: collapse;
+}
+
+#tablaResultados thead {
+    background: #4a9190;
+}
+
+#tablaResultados th,
+#tablaResultados td {
+    padding: 10px 8px;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+#tablaResultados tbody tr:nth-child(even) {
+    background: #d0dfe8;
+}
+
+#tablaResultados tbody tr:hover {
+    background: #c1dede;
+}
