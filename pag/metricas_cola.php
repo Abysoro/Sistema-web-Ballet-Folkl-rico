@@ -46,8 +46,8 @@
 
     
     <a href="auto.php">
-      <i class="fa-solid fa-car"></i>
-      <span>Auto</span>
+      <i class="fa-solid fa-user-check"></i>
+      <span>Asignación Inteligente</span>
     </a>
 
     <a href="detalle_asignacion.php">

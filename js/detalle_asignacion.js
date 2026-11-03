@@ -423,3 +423,116 @@ function generarPDFHistorialAsignacion(categoriaSeleccionada) {
       Swal.fire("Error", "No se pudo generar el PDF.", "error");
     });
 }
+
+
+/* =========================================
+   PAGINACIÓN - HISTORIAL DE ASIGNACIONES
+========================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const tabla = document.querySelector(".tabla-detalle-asignacion");
+    if (!tabla) return;
+
+    const tbody = tabla.querySelector("tbody");
+    if (!tbody) return;
+
+    const contenedorTabla = tabla.closest(".tabla-scroll") || tabla;
+
+    const registrosPorPagina = 10;
+    let paginaActual = 1;
+
+    const paginacion = document.createElement("div");
+    paginacion.id = "paginacionHistorial";
+    paginacion.className = "paginacion-historial";
+
+    paginacion.innerHTML = `
+        <button type="button" id="historialAnterior">
+            <i class="fa-solid fa-chevron-left"></i>
+            <span>Anterior</span>
+        </button>
+
+        <span id="historialInfoPagina">Página 1 de 1</span>
+
+        <button type="button" id="historialSiguiente">
+            <span>Siguiente</span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    `;
+
+    contenedorTabla.insertAdjacentElement("afterend", paginacion);
+
+    const btnAnterior = document.getElementById("historialAnterior");
+    const btnSiguiente = document.getElementById("historialSiguiente");
+    const infoPagina = document.getElementById("historialInfoPagina");
+
+    function mostrarPagina(reiniciar = false) {
+
+        const filas = Array.from(tbody.querySelectorAll("tr"));
+
+        // Ignorar filas informativas sin resultados
+        const registros = filas.filter(fila => {
+            return !fila.querySelector("td[colspan]");
+        });
+
+        if (reiniciar) {
+            paginaActual = 1;
+        }
+
+        if (registros.length === 0) {
+            paginacion.style.display = "none";
+            return;
+        }
+
+        const totalPaginas = Math.max(
+            1,
+            Math.ceil(registros.length / registrosPorPagina)
+        );
+
+        paginaActual = Math.min(
+            Math.max(1, paginaActual),
+            totalPaginas
+        );
+
+        const inicio = (paginaActual - 1) * registrosPorPagina;
+        const fin = inicio + registrosPorPagina;
+
+        registros.forEach((fila, indice) => {
+            fila.style.display =
+                indice >= inicio && indice < fin ? "" : "none";
+        });
+
+        infoPagina.textContent =
+            `Página ${paginaActual} de ${totalPaginas}`;
+
+        btnAnterior.disabled = paginaActual === 1;
+        btnSiguiente.disabled = paginaActual === totalPaginas;
+
+        paginacion.style.display =
+            totalPaginas > 1 ? "flex" : "none";
+    }
+
+    btnAnterior.addEventListener("click", function () {
+        if (paginaActual > 1) {
+            paginaActual--;
+            mostrarPagina();
+        }
+    });
+
+    btnSiguiente.addEventListener("click", function () {
+        paginaActual++;
+        mostrarPagina();
+    });
+
+    // Actualiza la paginación cuando se filtra por categoría
+    // o se vuelven a cargar los registros.
+    const observer = new MutationObserver(function () {
+        mostrarPagina(true);
+    });
+
+    observer.observe(tbody, {
+        childList: true
+    });
+
+    mostrarPagina();
+});

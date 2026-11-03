@@ -38,9 +38,9 @@
       <span>Registro de Presentaciones</span>
     </a>
 
-    <a href="auto.html">
-      <i class="fa-solid fa-car"></i>
-      <span>Auto</span>
+    <a href="auto.php">
+      <i class="fa-solid fa-user-check"></i>
+      <span>Asignación Inteligente</span>
     </a>
 
     <a href="detalle_asignacion.html">

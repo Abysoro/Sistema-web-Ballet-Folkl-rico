@@ -1,6 +1,15 @@
 let mostrandoCategoriasIntegrantes = false;
 let totalIntegrantesGeneralDashboard = 0;
 
+/* ==========================================
+   FILTROS Y PAGINACIÓN DE INTEGRANTES
+========================================== */
+
+let paginaListadoIntegrantes = 1;
+let totalPaginasListadoIntegrantes = 1;
+
+const integrantesPorPagina = 10;
+
 document.addEventListener("DOMContentLoaded", function () {
   if (document.getElementById("totalIntegrantes")) {
     cargarDashboardInicio();
@@ -24,6 +33,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (form) {
+
+    configurarFiltrosPaginacionIntegrantes();
+
     cargarIntegrantes();
 
     form.addEventListener("submit", async function (e) {
@@ -291,6 +303,7 @@ async function cargarIntegrantes() {
 
     if (!Array.isArray(lista) || lista.length === 0) {
       tabla.innerHTML = `
+      
         <tr>
           <td colspan="10">No hay integrantes registrados.</td>
         </tr>
@@ -341,6 +354,7 @@ async function cargarIntegrantes() {
     });
 
     tabla.innerHTML = html;
+    aplicarFiltrosPaginacionIntegrantes();
   } catch (error) {
     console.error("Error al cargar integrantes:", error);
     tabla.innerHTML = `
@@ -349,6 +363,276 @@ async function cargarIntegrantes() {
       </tr>
     `;
   }
+}
+/* ==========================================
+   CONFIGURAR FILTROS Y PAGINACIÓN
+========================================== */
+
+function configurarFiltrosPaginacionIntegrantes() {
+
+    const buscar = document.getElementById("buscarIntegrante");
+
+    const categoria = document.getElementById(
+        "filtroCategoriaIntegrantes"
+    );
+
+    const nivel = document.getElementById(
+        "filtroNivelIntegrantes"
+    );
+
+    const btnAnterior = document.getElementById(
+        "btnAnteriorIntegrantes"
+    );
+
+    const btnSiguiente = document.getElementById(
+        "btnSiguienteIntegrantes"
+    );
+
+    // Buscar por nombre o apellido
+    if (buscar) {
+        buscar.addEventListener("input", function () {
+            paginaListadoIntegrantes = 1;
+            aplicarFiltrosPaginacionIntegrantes();
+        });
+    }
+
+    // Filtrar por categoría
+    if (categoria) {
+        categoria.addEventListener("change", function () {
+            paginaListadoIntegrantes = 1;
+            aplicarFiltrosPaginacionIntegrantes();
+        });
+    }
+
+    // Filtrar por nivel
+    if (nivel) {
+        nivel.addEventListener("change", function () {
+            paginaListadoIntegrantes = 1;
+            aplicarFiltrosPaginacionIntegrantes();
+        });
+    }
+
+    // Página anterior
+    if (btnAnterior) {
+        btnAnterior.addEventListener("click", function () {
+
+            if (paginaListadoIntegrantes > 1) {
+                paginaListadoIntegrantes--;
+                aplicarFiltrosPaginacionIntegrantes();
+            }
+
+        });
+    }
+
+    // Página siguiente
+    if (btnSiguiente) {
+        btnSiguiente.addEventListener("click", function () {
+
+            if (
+                paginaListadoIntegrantes <
+                totalPaginasListadoIntegrantes
+            ) {
+                paginaListadoIntegrantes++;
+                aplicarFiltrosPaginacionIntegrantes();
+            }
+
+        });
+    }
+}
+
+
+/* ==========================================
+   APLICAR BÚSQUEDA Y FILTROS
+========================================== */
+
+function aplicarFiltrosPaginacionIntegrantes() {
+
+    const tabla = document.getElementById("tablaIntegrantes");
+
+    if (!tabla) return;
+
+    const buscar = normalizarTexto(
+        document.getElementById("buscarIntegrante")?.value || ""
+    );
+
+    const categoriaSeleccionada = normalizarTexto(
+        document.getElementById(
+            "filtroCategoriaIntegrantes"
+        )?.value || ""
+    );
+
+    const nivelSeleccionado = normalizarTexto(
+        document.getElementById(
+            "filtroNivelIntegrantes"
+        )?.value || ""
+    );
+
+    // Eliminar mensaje anterior de búsqueda vacía
+    const mensajeAnterior = document.getElementById(
+        "mensajeSinResultadosIntegrantes"
+    );
+
+    if (mensajeAnterior) {
+        mensajeAnterior.remove();
+    }
+
+    // Obtener solamente las filas de integrantes
+    const filas = Array.from(
+        tabla.querySelectorAll("tr")
+    ).filter(fila => fila.cells.length === 10);
+
+    // Aplicar filtros combinados
+    const filasFiltradas = filas.filter(fila => {
+
+        const nombre = normalizarTexto(
+            fila.cells[0].textContent
+        );
+
+        const apellido = normalizarTexto(
+            fila.cells[1].textContent
+        );
+
+        const categoria = normalizarTexto(
+            fila.cells[2].textContent
+        );
+
+        const nivel = normalizarTexto(
+            fila.cells[3].textContent
+        );
+
+        const nombreCompleto = `${nombre} ${apellido}`;
+
+        const coincideBusqueda =
+            buscar === "" ||
+            nombreCompleto.includes(buscar);
+
+        const coincideCategoria =
+            categoriaSeleccionada === "" ||
+            categoria === categoriaSeleccionada ||
+            (
+                categoriaSeleccionada === "juvenil" &&
+                categoria === "juveniles"
+            );
+
+        const coincideNivel =
+            nivelSeleccionado === "" ||
+            nivel === nivelSeleccionado;
+
+        return (
+            coincideBusqueda &&
+            coincideCategoria &&
+            coincideNivel
+        );
+    });
+
+    const totalFiltrados = filasFiltradas.length;
+
+    totalPaginasListadoIntegrantes = Math.max(
+        1,
+        Math.ceil(totalFiltrados / integrantesPorPagina)
+    );
+
+    // Evitar páginas fuera de rango
+    if (
+        paginaListadoIntegrantes >
+        totalPaginasListadoIntegrantes
+    ) {
+        paginaListadoIntegrantes =
+            totalPaginasListadoIntegrantes;
+    }
+
+    // Calcular registros de la página
+    const inicio = (
+        paginaListadoIntegrantes - 1
+    ) * integrantesPorPagina;
+
+    const fin = inicio + integrantesPorPagina;
+
+    const filasPagina = filasFiltradas.slice(inicio, fin);
+
+    // Ocultar filas y mostrar solo las seleccionadas
+    filas.forEach(fila => {
+        fila.style.display = "none";
+    });
+
+    filasPagina.forEach(fila => {
+        fila.style.display = "";
+    });
+
+    // Mensaje si no hay coincidencias
+    if (totalFiltrados === 0 && filas.length > 0) {
+
+        const filaMensaje = document.createElement("tr");
+
+        filaMensaje.id = "mensajeSinResultadosIntegrantes";
+
+        filaMensaje.innerHTML = `
+            <td colspan="10" style="text-align:center; padding:25px;">
+                No se encontraron integrantes con los filtros seleccionados.
+            </td>
+        `;
+
+        tabla.appendChild(filaMensaje);
+    }
+
+    actualizarControlesPaginacionIntegrantes(
+        totalFiltrados,
+        inicio
+    );
+}
+
+
+/* ==========================================
+   ACTUALIZAR CONTROLES DE PAGINACIÓN
+========================================== */
+
+function actualizarControlesPaginacionIntegrantes(
+    total,
+    inicio
+) {
+
+    const info = document.getElementById(
+        "infoPaginacionIntegrantes"
+    );
+
+    const numeroPagina = document.getElementById(
+        "paginaActualIntegrantes"
+    );
+
+    const btnAnterior = document.getElementById(
+        "btnAnteriorIntegrantes"
+    );
+
+    const btnSiguiente = document.getElementById(
+        "btnSiguienteIntegrantes"
+    );
+
+    const desde = total === 0 ? 0 : inicio + 1;
+
+    const hasta = Math.min(
+        inicio + integrantesPorPagina,
+        total
+    );
+
+    if (info) {
+        info.textContent =
+            `Mostrando ${desde} - ${hasta} de ${total} integrantes`;
+    }
+
+    if (numeroPagina) {
+        numeroPagina.textContent =
+            `Página ${paginaListadoIntegrantes} de ${totalPaginasListadoIntegrantes}`;
+    }
+
+    if (btnAnterior) {
+        btnAnterior.disabled =
+            paginaListadoIntegrantes <= 1;
+    }
+
+    if (btnSiguiente) {
+        btnSiguiente.disabled =
+            paginaListadoIntegrantes >= totalPaginasListadoIntegrantes;
+    }
 }
 
 /* RETIRAR */

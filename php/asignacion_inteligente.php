@@ -69,6 +69,92 @@ $sin_candidatos = 0;
 
 $asignados = 0;
 
+
+function guardarColaConFechaOriginal(
+    $conn,
+    $id_integrante,
+    $id_presentacion,
+    $estado,
+    $puntaje,
+    $motivoSQL,
+    $vecesNoAsignado
+) {
+    $id_integrante = (int)$id_integrante;
+    $id_presentacion = (int)$id_presentacion;
+    $estado = ($estado === 'asignado') ? 'asignado' : 'esperando';
+    $puntaje = number_format((float)$puntaje, 2, '.', '');
+    $vecesNoAsignado = (int)$vecesNoAsignado;
+
+    $res = $conn->query("
+        SELECT id_cola, fecha_ingreso
+        FROM cola_asignacion
+        WHERE id_integrante = $id_integrante
+          AND id_presentacion = $id_presentacion
+        ORDER BY id_cola ASC
+        LIMIT 1
+    ");
+
+    if (!$res) {
+        throw new Exception($conn->error);
+    }
+
+    if ($fila = $res->fetch_assoc()) {
+
+        $id_cola = (int)$fila['id_cola'];
+
+        if (empty($fila['fecha_ingreso']) || $fila['fecha_ingreso'] === '0000-00-00 00:00:00') {
+            throw new Exception("El registro de cola no tiene una fecha de ingreso válida.");
+        }
+
+        $sql = "
+            UPDATE cola_asignacion
+            SET estado = '$estado',
+                prioridad_calculada = $puntaje,
+                observacion = '$motivoSQL',
+                veces_no_asignado = $vecesNoAsignado
+            WHERE id_cola = $id_cola
+        ";
+
+        if (!$conn->query($sql)) {
+            throw new Exception($conn->error);
+        }
+
+        return $fila['fecha_ingreso'];
+    }
+
+    $sql = "
+        INSERT INTO cola_asignacion
+        (
+            id_integrante, id_presentacion, fecha_ingreso,
+            estado, prioridad, prioridad_calculada,
+            observacion, veces_no_asignado
+        )
+        VALUES
+        (
+            $id_integrante, $id_presentacion, NOW(),
+            '$estado', 0, $puntaje,
+            '$motivoSQL', $vecesNoAsignado
+        )
+    ";
+
+    if (!$conn->query($sql)) {
+        throw new Exception($conn->error);
+    }
+
+    $id_cola = (int)$conn->insert_id;
+
+    $resFecha = $conn->query("
+        SELECT fecha_ingreso
+        FROM cola_asignacion
+        WHERE id_cola = $id_cola
+    ");
+
+    if (!$resFecha || !($fila = $resFecha->fetch_assoc())) {
+        throw new Exception("No se pudo obtener la fecha de ingreso.");
+    }
+
+    return $fila['fecha_ingreso'];
+}
 /* =========================
    FUNCIONES AUXILIARES
 ========================= */
@@ -1224,7 +1310,7 @@ $candidatos = [];
             'tipo_asignacion' => $i['tipo_asignacion'],
             'motivo_excepcion' => $i['motivo_excepcion']
         ];
-         
+
     }
 
     /* =========================
@@ -1343,32 +1429,16 @@ $candidatos = [];
             if (!$conn->query($sqlEval)) {
                 die("Error al guardar evaluación: " . $conn->error);
             }
-
-            /* Guardar en cola_asignacion */
-            $sqlCola = "INSERT INTO cola_asignacion
-                        (
-                            id_integrante,
-                            id_presentacion,
-                            fecha_ingreso,
-                            estado,
-                            prioridad,
-                            prioridad_calculada,
-                            observacion,
-                            veces_no_asignado
-                        )
-                        VALUES
-                        (
-                            $id_integrante,
-                            $id_presentacion,
-                            NOW(),
-                            'asignado',
-                            0,
-                            {$c['puntaje_total']},
-                            '$motivoSQL',
-                            {$c['veces_no_asignado']}
-                        )";
-
-            $conn->query($sqlCola);
+            /* Conservar la fecha original de ingreso a cola (asignado). */
+            $fechaIngresoCola = guardarColaConFechaOriginal(
+                $conn,
+                $id_integrante,
+                $id_presentacion,
+                'asignado',
+                $c['puntaje_total'],
+                $motivoSQL,
+                $c['veces_no_asignado']
+            );
 
             /* Verificar si ya existe en la relación final */
             $sqlVerificar = "SELECT *
@@ -1408,7 +1478,12 @@ $candidatos = [];
                 if ($resBuscarDetalle && $resBuscarDetalle->num_rows > 0) {
                     $detalle = $resBuscarDetalle->fetch_assoc();
                     $id_detalle = (int)$detalle['id_detalle'];
-                    $fecha_ingreso_cola = $detalle['fecha_ingreso_cola'];
+                    // Una fecha '0000-00-00 00:00:00' no es una fecha de ingreso válida.
+                    $fechaDetalle = $detalle['fecha_ingreso_cola'] ?? null;
+                    $fecha_ingreso_cola = (
+                        !empty($fechaDetalle)
+                        && $fechaDetalle !== '0000-00-00 00:00:00'
+                    ) ? $fechaDetalle : $fechaIngresoCola;
 
                     $segundos_espera = strtotime($fecha_asignacion) - strtotime($fecha_ingreso_cola);
                     $tiempo_espera = floor($segundos_espera / 60);
@@ -1428,7 +1503,8 @@ $candidatos = [];
                         $motivoExcepcionSQL = "NULL";
                     }
                     $sqlActualizarDetalle = "UPDATE detalle_asignacion
-                         SET fecha_asignacion = '$fecha_asignacion',
+                         SET fecha_ingreso_cola = '$fecha_ingreso_cola',
+                             fecha_asignacion = '$fecha_asignacion',
                              tiempo_espera = $tiempo_espera,
                              orden_atencion = $orden_atencion,
                              estado_asignacion = 'Asignado',
@@ -1437,10 +1513,12 @@ $candidatos = [];
                              tipo_asignacion = '$tipoAsignacionSQL',
                              motivo_excepcion = $motivoExcepcionSQL
                          WHERE id_detalle = $id_detalle";
-                    $conn->query($sqlActualizarDetalle);
+                    if (!$conn->query($sqlActualizarDetalle)) {
+                        throw new Exception("Error al actualizar detalle asignado: " . $conn->error);
+                    }
 
                 } else {
-                    $fecha_ingreso_cola = $fecha_asignacion;
+                    $fecha_ingreso_cola = $fechaIngresoCola;
                     $segundos_espera = strtotime($fecha_asignacion) - strtotime($fecha_ingreso_cola);
                     $tiempo_espera = floor($segundos_espera / 60);
 
@@ -1478,7 +1556,9 @@ $candidatos = [];
                     '$tipoAsignacionSQL',
                     $motivoExcepcionSQL
                )";
-                    $conn->query($sqlDetalle);
+                    if (!$conn->query($sqlDetalle)) {
+                        throw new Exception("Error al insertar detalle asignado: " . $conn->error);
+                    }
                 }
 
                 $asignados++;
@@ -1506,6 +1586,13 @@ $candidatos = [];
             );
 
             $motivoSQL = textoSQL($conn, $motivo);
+
+            /* Valores propios de este integrante en espera. */
+            $tipoAsignacionSQL = textoSQL($conn, $c['tipo_asignacion'] ?? 'normal');
+            $motivoExcepcion = $c['motivo_excepcion'] ?? null;
+            $motivoExcepcionSQL = ($motivoExcepcion !== null && trim($motivoExcepcion) !== '')
+                ? "'" . textoSQL($conn, $motivoExcepcion) . "'"
+                : "NULL";
 
             $sqlEval = "INSERT INTO evaluacion_asignacion
                         (
@@ -1539,31 +1626,16 @@ $candidatos = [];
             if (!$conn->query($sqlEval)) {
                 die("Error al guardar evaluación en espera: " . $conn->error);
             }
-
-            $sqlCola = "INSERT INTO cola_asignacion
-                        (
-                            id_integrante,
-                            id_presentacion,
-                            fecha_ingreso,
-                            estado,
-                            prioridad,
-                            prioridad_calculada,
-                            observacion,
-                            veces_no_asignado
-                        )
-                        VALUES
-                        (
-                            $id_integrante,
-                            $id_presentacion,
-                            NOW(),
-                            'esperando',
-                            0,
-                            {$c['puntaje_total']},
-                            '$motivoSQL',
-                            {$c['veces_no_asignado']}
-                        )";
-
-            $conn->query($sqlCola);
+            /* Conservar la fecha original de ingreso a cola (en espera). */
+            $fechaIngresoCola = guardarColaConFechaOriginal(
+                $conn,
+                $id_integrante,
+                $id_presentacion,
+                'esperando',
+                $c['puntaje_total'],
+                $motivoSQL,
+                $c['veces_no_asignado']
+            );
 
             $sqlExisteEspera = "SELECT id_detalle
                                 FROM detalle_asignacion
@@ -1572,7 +1644,11 @@ $candidatos = [];
                                 LIMIT 1";
             $resExisteEspera = $conn->query($sqlExisteEspera);
 
-            if (!$resExisteEspera || $resExisteEspera->num_rows == 0) {
+            if (!$resExisteEspera) {
+                throw new Exception('Error al verificar detalle en espera: ' . $conn->error);
+            }
+
+            if ($resExisteEspera->num_rows == 0) {
                 $sqlDetalleEspera = "INSERT INTO detalle_asignacion
                      (
                         id_integrante,
@@ -1593,7 +1669,7 @@ $candidatos = [];
                         $id_integrante,
                         $id_presentacion,
                         $id_categoria,
-                        NOW(),
+                        '$fechaIngresoCola',
                         NULL,
                         NULL,
                         NULL,
@@ -1603,7 +1679,9 @@ $candidatos = [];
                         '$tipoAsignacionSQL',
                         $motivoExcepcionSQL
                      )";
-                $conn->query($sqlDetalleEspera);
+                if (!$conn->query($sqlDetalleEspera)) {
+                    throw new Exception("Error al insertar detalle en espera: " . $conn->error);
+                }
             }
         }
     }

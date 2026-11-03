@@ -47,8 +47,8 @@
 
     
     <a href="auto.php">
-      <i class="fa-solid fa-car"></i>
-      <span>Auto</span>
+      <i class="fa-solid fa-user-check"></i>
+      <span>Asignación Inteligente</span>
     </a>
 
     <a href="detalle_asignacion.php">
@@ -103,7 +103,7 @@
  
     <div class="filtro-detalle" style="margin-bottom: 20px;">
       <label for="filtroCategoria">Filtrar por categoría:</label>
-      <select id="filtroCategoria">
+      <select id="filtroCategoria" class="filtro-categoria-evaluacion">
         <option value="Todas">Todas</option>
       </select>
     </div>

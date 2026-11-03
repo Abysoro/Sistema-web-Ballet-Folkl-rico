@@ -34,6 +34,7 @@ if (
 }
 
 date_default_timezone_set('America/La_Paz');
+$conn->query("SET time_zone = '-04:00'");
 
 $hoy = date('Y-m-d');
 
@@ -103,7 +104,8 @@ try {
                             id_lugar,
                             id_jornada,
                             duracion_minutos,
-                            estado
+                            estado,
+                            fecha_registro
                         )
                         VALUES
                         (
@@ -119,7 +121,8 @@ try {
                             $id_lugar_normalizado,
                             $valorJornada,
                             '$duracion_minutos',
-                            'Activa'
+                            'Activa',
+                            NOW()
                         )";
 
     if (!$conn->query($sqlPresentacion)) {

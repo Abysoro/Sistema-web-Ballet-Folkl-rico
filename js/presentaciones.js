@@ -372,6 +372,20 @@ function cargarJornadasPresentacion() {
       const select = document.getElementById("jornada");
       if (!select) return;
 
+      select.onchange = function () {
+    const campoFecha = document.getElementById("fecha");
+    const opcion = this.options[this.selectedIndex];
+
+      if (!campoFecha) return;
+
+      if (this.value && opcion.dataset.fecha) {
+          campoFecha.value = opcion.dataset.fecha;
+          campoFecha.readOnly = true;
+      } else {
+          campoFecha.readOnly = false;
+      }
+      };
+
       select.innerHTML = "";
 
       const opcionInicial = document.createElement("option");
@@ -390,6 +404,7 @@ function cargarJornadasPresentacion() {
       data.jornadas.forEach(j => {
         const option = document.createElement("option");
         option.value = j.id_jornada;
+        option.dataset.fecha = j.fecha;
         option.textContent = `${j.nombre_jornada} - ${j.fecha} - ${j.lugar}`;
         select.appendChild(option);
       });

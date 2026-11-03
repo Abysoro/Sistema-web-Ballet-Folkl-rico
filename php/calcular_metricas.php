@@ -61,22 +61,57 @@ while ($p = $resPresentaciones->fetch_assoc()) {
 
    /* tiempo de espera promedio en segundos:
    mide solo cuánto tardaron en asignarse los integrantes ya asignados */
-$sqlEspera = "SELECT 
-                COALESCE(
-                    AVG(
-                        TIMESTAMPDIFF(
-                            SECOND,
-                            d.fecha_ingreso_cola,
-                            d.fecha_asignacion
-                        )
-                    ),
-                    0
-                ) AS promedio
-              FROM detalle_asignacion d
-              WHERE d.id_presentacion = $id_presentacion
-              AND d.estado_asignacion = 'Asignado'
-              AND d.fecha_ingreso_cola IS NOT NULL
-              AND d.fecha_asignacion IS NOT NULL";
+
+/* TIEMPO DE ESPERA PROMEDIO */
+
+$sqlEspera = "
+SELECT COALESCE(
+    AVG(
+        CASE
+            WHEN d.fecha_ingreso_cola IS NULL
+            THEN NULL
+
+            /* Integrantes asignados: tiempo fijo */
+            WHEN d.estado_asignacion = 'Asignado'
+                 AND d.fecha_asignacion IS NOT NULL
+            THEN GREATEST(
+                0,
+                TIMESTAMPDIFF(
+                    SECOND,
+                    d.fecha_ingreso_cola,
+                    d.fecha_asignacion
+                )
+            )
+
+            /* Integrantes en espera */
+            WHEN d.estado_asignacion = 'En espera'
+            THEN GREATEST(
+                0,
+                TIMESTAMPDIFF(
+                    SECOND,
+                    d.fecha_ingreso_cola,
+                    COALESCE(
+                        (
+                            SELECT MAX(d2.fecha_asignacion)
+                            FROM detalle_asignacion d2
+                            WHERE d2.id_presentacion = d.id_presentacion
+                              AND d2.estado_asignacion = 'Asignado'
+                              AND d2.fecha_asignacion IS NOT NULL
+                        ),
+                        NOW()
+                    )
+                )
+            )
+
+            ELSE NULL
+        END
+    ),
+    0
+) AS promedio
+FROM detalle_asignacion d
+WHERE d.id_presentacion = $id_presentacion
+";
+
 
 $resEspera = $conn->query($sqlEspera);
 

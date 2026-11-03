@@ -62,7 +62,7 @@ function cargarMetricasCola() {
             <td>${formatearNumero(m.tasa_llegada)}</td>
             <td>${formatearNumero(m.tasa_servicio)}</td>
             <td>${m.longitud_cola ?? 0}</td>
-            <td>${formatearTiempoEspera(m.tiempo_espera_promedio)}</td>
+            <td>${formatearTiempoEspera(m.tiempo_hasta_completar_segundos)}</td>
             <td>${formatearNumero(m.utilizacion_sistema)}</td>
           </tr>
         `;
@@ -121,7 +121,7 @@ function exportarReporteTeoriaColasPDF() {
         item.tasa_llegada,
         item.tasa_servicio,
         item.longitud_cola,
-        item.tiempo_espera_promedio,
+        item.tiempo_hasta_completar,
         item.utilizacion_sistema
       ]);
 
@@ -173,40 +173,51 @@ function exportarReporteTeoriaColasPDF() {
 }
 
 
-function formatearTiempoEspera(valor) {
-  const totalSegundos = Math.round(Number(valor || 0));
 
-  if (totalSegundos <= 0) {
-    return "0 seg";
-  }
+function formatearTiempoEspera(segundos) {
+    if (segundos === null || segundos === undefined || segundos === "") {
+        return "Sin dato";
+    }
 
-  if (totalSegundos < 60) {
-    return `${totalSegundos} seg`;
-  }
+    segundos = Number(segundos);
 
-  const horas = Math.floor(totalSegundos / 3600);
-  const minutos = Math.floor((totalSegundos % 3600) / 60);
-  const segundos = totalSegundos % 60;
+    if (!Number.isFinite(segundos)) {
+        return "Sin dato";
+    }
 
-  if (horas > 0) {
-    let texto = `${horas} h`;
+    segundos = Math.max(0, Math.floor(segundos));
+
+    if (segundos === 0) {
+        return "0 seg";
+    }
+
+
+    const dias = Math.floor(segundos / 86400);
+    const horas = Math.floor((segundos % 86400) / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const seg = segundos % 60;
+
+    if (dias > 0) {
+        let texto = `${dias} ${dias === 1 ? "día" : "días"}`;
+
+        if (horas > 0) texto += ` ${horas} h`;
+        if (minutos > 0) texto += ` ${minutos} min`;
+
+        return texto;
+    }
+
+    if (horas > 0) {
+        let texto = `${horas} h`;
+
+        if (minutos > 0) texto += ` ${minutos} min`;
+        if (seg > 0) texto += ` ${seg} seg`;
+
+        return texto;
+    }
 
     if (minutos > 0) {
-      texto += ` ${minutos} min`;
+        return `${minutos} min${seg > 0 ? ` ${seg} seg` : ""}`;
     }
 
-    if (segundos > 0) {
-      texto += ` ${segundos} seg`;
-    }
-
-    return texto;
-  }
-
-  let texto = `${minutos} min`;
-
-  if (segundos > 0) {
-    texto += ` ${segundos} seg`;
-  }
-
-  return texto;
+    return `${seg} seg`;
 }

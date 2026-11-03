@@ -616,16 +616,7 @@ input[type='button'] {
   overflow: hidden;
 }
 
-button::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: var(--cyan);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
-}
+
 
 button > *,
 button i,
@@ -4484,4 +4475,620 @@ body.sidebar-abierta .panel-dashboard {
   color: inherit !important;
   opacity: 1 !important;
   visibility: visible !important;
+}
+
+/* =====================================
+   FILTROS DEL LISTADO DE INTEGRANTES
+===================================== */
+
+.filtros-integrantes {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 14px;
+    margin: 18px 0 22px;
+    align-items: end;
+}
+
+.filtros-integrantes .filtro-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.filtros-integrantes .filtro-item label {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #00dffc;
+}
+
+.filtros-integrantes .filtro-item input,
+.filtros-integrantes .filtro-item select {
+    width: 100%;
+    min-width: 0;
+    height: 42px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #68b5ce;
+    background: #16394c;
+    color: #ffffff;
+    font-size: 0.85rem;
+    box-sizing: border-box;
+}
+
+.filtros-integrantes .filtro-item input:focus,
+.filtros-integrantes .filtro-item select:focus {
+    outline: none;
+    border-color: #00dffc;
+}
+
+/* =====================================
+   PAGINACIÓN DEL LISTADO
+===================================== */
+
+.paginacion-integrantes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 5px 8px;
+    flex-wrap: wrap;
+}
+
+.paginacion-controles {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.paginacion-controles button {
+    padding: 10px 15px;
+    border-radius: 9px;
+    background: #15394d;
+    border: 1px solid #00dffc;
+    color: #00dffc;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.paginacion-controles button:hover:not(:disabled) {
+    background: rgba(0, 223, 252, 0.15);
+}
+
+.paginacion-controles button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+#infoPaginacionIntegrantes,
+#paginaActualIntegrantes {
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* MODO CLARO */
+
+body.modo-claro .filtros-integrantes .filtro-item label {
+    color: #075f72;
+}
+
+body.modo-claro .filtros-integrantes .filtro-item input,
+body.modo-claro .filtros-integrantes .filtro-item select {
+    background: #f5fafc;
+    color: #17364b;
+}
+
+body.modo-claro .paginacion-controles button {
+    background: #edf8fc;
+    color: #075f72;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+    .filtros-integrantes {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+/* FILTROS Y PAGINACIÓN - SATURACIÓN */
+
+.swal-saturacion-suave .saturacion-filtros {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.swal-saturacion-suave .saturacion-filtros > div {
+    min-width: 0;
+}
+
+.swal-saturacion-suave .saturacion-filtros label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #31566e;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+}
+
+.swal-saturacion-suave .saturacion-filtros input,
+.swal-saturacion-suave .saturacion-filtros select {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    margin: 0 !important;
+    padding: 8px 10px !important;
+    box-sizing: border-box !important;
+    border: 1px solid #a8cddd !important;
+    border-radius: 10px !important;
+    background: #f7fcff !important;
+    color: #264a60 !important;
+    font-size: 13px !important;
+}
+
+.swal-saturacion-suave .saturacion-resultados {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 700;
+    color: #42667b;
+    margin: 8px 0 12px;
+}
+
+.swal-saturacion-suave .saturacion-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.swal-saturacion-suave .saturacion-paginacion button {
+    padding: 9px 14px;
+    border: 1px solid #00b9ce;
+    border-radius: 10px;
+    background: #eef9fc;
+    color: #126079;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.swal-saturacion-suave .saturacion-paginacion button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+}
+
+.swal-saturacion-suave .saturacion-paginacion span {
+    font-weight: 800;
+    font-size: 13px;
+    color: #294e65;
+}
+
+.swal-saturacion-suave .saturacion-sin-resultados {
+    text-align: center;
+    padding: 25px 12px;
+    color: #536b7b;
+}
+
+@media (max-width: 650px) {
+    .swal-saturacion-suave .saturacion-filtros {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* SELECTOR DE CATEGORÍAS - EVALUACIÓN */
+
+#filtroCategoria.filtro-categoria-evaluacion {
+    width: 350px !important;
+    max-width: 90% !important;
+    min-width: 0 !important;
+    height: 42px !important;
+    display: block !important;
+    margin: 12px auto 20px !important;
+    padding: 8px 14px !important;
+    box-sizing: border-box !important;
+    border: 1px solid #00dffc !important;
+    border-radius: 10px !important;
+    background: #102e43 !important;
+    color: #ffffff !important;
+    font-size: 13px !important;
+}
+
+
+/* =========================================
+   CORRECCIÓN DE BOTONES DE PAGINACIÓN
+========================================= */
+
+:is(
+    .paginacion,
+    .paginacion-integrantes,
+    .pagination,
+    .saturacion-paginacion
+) button:not(:disabled) {
+    background: #e9f8fc !important;
+    color: #16465e !important;
+    border: 1px solid #00bfd6 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Cuando el cursor pasa sobre el botón */
+
+:is(
+    .paginacion,
+    .paginacion-integrantes,
+    .pagination,
+    .saturacion-paginacion
+) button:not(:disabled):hover,
+:is(
+    .paginacion,
+    .paginacion-integrantes,
+    .pagination,
+    .saturacion-paginacion
+) button:not(:disabled):focus {
+    background: #00d5eb !important;
+    color: #073447 !important;
+    border-color: #00b7ce !important;
+    box-shadow: 0 0 10px rgba(0, 213, 235, .2) !important;
+}
+
+/* Mantener visibles letras e iconos */
+
+:is(
+    .paginacion,
+    .paginacion-integrantes,
+    .pagination,
+    .saturacion-paginacion
+) button span,
+:is(
+    .paginacion,
+    .paginacion-integrantes,
+    .pagination,
+    .saturacion-paginacion
+) button i {
+    color: inherit !important;
+    font-size: inherit !important;
+}
+
+/* Botones deshabilitados */
+
+:is(
+    .paginacion,
+    .paginacion-integrantes,
+    .pagination,
+    .saturacion-paginacion
+) button:disabled {
+    background: #e6f1f5 !important;
+    color: #83a2b1 !important;
+    border: 1px solid #a7d6e2 !important;
+    opacity: .65 !important;
+    cursor: not-allowed !important;
+}
+
+
+
+/* BOTÓN CERRAR DEL MODAL DE SATURACIÓN */
+
+.swal-saturacion-suave .swal2-confirm,
+.swal-saturacion-suave .swal2-confirm:hover,
+.swal-saturacion-suave .swal2-confirm:focus,
+.swal-saturacion-suave .swal2-confirm:active {
+    background: #00c7dd !important;
+    color: #073447 !important;
+    border: 1px solid #00b5cc !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    letter-spacing: 1px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    text-shadow: none !important;
+}
+
+
+
+
+/* =========================================
+   PAGINACIÓN - HISTORIAL DE ASIGNACIONES
+========================================= */
+
+.paginacion-historial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin: 20px auto;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.paginacion-historial button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+
+    min-width: 120px;
+    height: 40px;
+    padding: 8px 15px;
+
+    background: #102e43 !important;
+    color: #00dffc !important;
+    border: 1px solid #00dffc !important;
+    border-radius: 10px;
+
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.paginacion-historial button::before {
+    display: none !important;
+}
+
+.paginacion-historial button span,
+.paginacion-historial button i {
+    color: inherit !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.paginacion-historial button:hover:not(:disabled) {
+    background: #164a60 !important;
+    color: #ffffff !important;
+}
+
+.paginacion-historial button:disabled {
+    opacity: 0.4 !important;
+    cursor: not-allowed;
+}
+
+#historialInfoPagina {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 900;
+}
+
+body.modo-claro #historialInfoPagina {
+    color: #214a61;
+}
+
+body.modo-claro .paginacion-historial button {
+    background: #edf8fc !important;
+    color: #075f72 !important;
+}
+
+
+
+
+/* =========================================
+   MODAL SUPLENTES - AMBOS TEMAS
+========================================= */
+
+/* MODO OSCURO */
+
+body:not(.modo-claro) .swal2-popup.swal-suplentes {
+    background: linear-gradient(180deg, #071c2e, #102f46) !important;
+    border: 1px solid #00dffc !important;
+    border-radius: 20px !important;
+    color: #ffffff !important;
+}
+
+body:not(.modo-claro) .swal-suplentes .swal2-title {
+    color: #00dffc !important;
+}
+
+body:not(.modo-claro) .swal-suplentes .swal2-html-container {
+    color: #e6f6ff !important;
+}
+
+body:not(.modo-claro) .swal-suplentes .suplente-tarjeta {
+    background: #12334a !important;
+    border: 1px solid #23647d !important;
+    color: #e6f6ff !important;
+}
+
+body:not(.modo-claro) .swal-suplentes .suplente-tarjeta strong,
+body:not(.modo-claro) .swal-suplentes .suplente-tarjeta b {
+    color: #47e7ff !important;
+}
+
+/* MODO CLARO */
+
+body.modo-claro .swal2-popup.swal-suplentes {
+    background: linear-gradient(180deg, #f8fcfe, #e8f3f8) !important;
+    border: 1px solid #b9dbe9 !important;
+    border-radius: 20px !important;
+    color: #17364b !important;
+}
+
+body.modo-claro .swal-suplentes .swal2-title {
+    color: #1f4963 !important;
+}
+
+body.modo-claro .swal-suplentes .swal2-html-container {
+    color: #294c63 !important;
+}
+
+body.modo-claro .swal-suplentes .suplente-tarjeta {
+    background: #f8fcfe !important;
+    border: 1px solid #b7dce9 !important;
+    color: #294c63 !important;
+}
+
+body.modo-claro .swal-suplentes .suplente-tarjeta strong,
+body.modo-claro .swal-suplentes .suplente-tarjeta b {
+    color: #175b76 !important;
+}
+
+/* DISTRIBUCIÓN DE SUPLENTES */
+
+.swal-suplentes .suplentes-lista {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 8px;
+    text-align: left;
+}
+
+.swal-suplentes .suplente-tarjeta {
+    text-align: left;
+    margin-bottom: 14px;
+    padding: 15px;
+    border-radius: 12px;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+/* BOTÓN CERRAR */
+
+.swal2-popup.swal-suplentes .swal2-confirm {
+    background: #00c7dd !important;
+    color: #073447 !important;
+    font-weight: 900 !important;
+}
+
+
+
+/* =========================================
+   SATURACIÓN - MODO OSCURO
+========================================= */
+
+/* Fondo principal del modal */
+body:not(.modo-claro) .swal2-popup.swal-saturacion-suave {
+    background: linear-gradient(
+        180deg,
+        #071c2e 0%,
+        #102f46 100%
+    ) !important;
+    border: 1px solid #00dffc !important;
+    color: #ffffff !important;
+}
+
+/* Título */
+body:not(.modo-claro) .swal-saturacion-suave .swal2-title {
+    color: #00dffc !important;
+}
+
+/* Contenido general */
+body:not(.modo-claro) .swal-saturacion-suave .swal2-html-container {
+    color: #e6f6ff !important;
+}
+
+/* Filtros */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-filtros label,
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-resultados {
+    color: #b7dce9 !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-filtros input,
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-filtros select {
+    background: #102d43 !important;
+    color: #ffffff !important;
+    border: 1px solid #277b93 !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-filtros input::placeholder {
+    color: #a0bacb !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-filtros option {
+    background: #102d43 !important;
+    color: #ffffff !important;
+}
+
+/* Encabezado de categoría */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-categoria-titulo {
+    background: #153b51 !important;
+    border: 1px solid #28758a !important;
+}
+
+/* Tarjetas */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-card {
+    background: #102b40 !important;
+    border-top-color: #28536d !important;
+    border-right-color: #28536d !important;
+    border-bottom-color: #28536d !important;
+    color: #eaf7ff !important;
+    box-shadow: 0 6px 16px rgba(0,0,0,.18) !important;
+}
+
+/* Nombre del integrante */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-card h4 {
+    color: #ffffff !important;
+}
+
+/* Recuadros de información */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-grid div,
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-motivo {
+    background: #17394f !important;
+    border: 1px solid #2b5870 !important;
+}
+
+/* Etiquetas */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-grid small,
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-motivo small {
+    color: #a9c9da !important;
+}
+
+/* Valores y motivo */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-grid strong,
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-motivo p {
+    color: #f0f9ff !important;
+}
+
+/* Estados */
+body:not(.modo-claro) .swal-saturacion-suave
+.saturacion-disponible .saturacion-card-header span {
+    color: #55efae !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave
+.saturacion-alerta .saturacion-card-header span {
+    color: #ff83b5 !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave
+.saturacion-info .saturacion-card-header span {
+    color: #58dff5 !important;
+}
+
+/* Paginación */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-paginacion span {
+    color: #eaf7ff !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave
+.saturacion-paginacion button {
+    background: #12364e !important;
+    color: #5be9ff !important;
+    border: 1px solid #00bfd6 !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave
+.saturacion-paginacion button:hover:not(:disabled) {
+    background: #1b5068 !important;
+    color: #ffffff !important;
+}
+
+body:not(.modo-claro) .swal-saturacion-suave
+.saturacion-paginacion button::before {
+    display: none !important;
+}
+
+/* Mensaje sin resultados */
+body:not(.modo-claro) .swal-saturacion-suave .saturacion-sin-resultados {
+    color: #b7dce9 !important;
 }

@@ -128,11 +128,13 @@ function cargarEvaluacion() {
                     </tr>
                 `;
                 llenarFiltroCategorias([]);
+                completarFiltroCategorias();
                 llenarFiltroPresentaciones([]);
                 return;
             }
 
             llenarFiltroCategorias(data);
+            completarFiltroCategorias();
             llenarFiltroPresentaciones(data);
             aplicarFiltros();
         })
@@ -147,6 +149,38 @@ function cargarEvaluacion() {
                 `;
             }
         });
+}
+
+function completarFiltroCategorias() {
+    const select = document.getElementById("filtroCategoria");
+    if (!select) return;
+
+    const categorias = [
+        "Niños",
+        "Juvenil",
+        "Aspirantes",
+        "Elenco Oficial"
+    ];
+
+    const normalizar = texto => String(texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace("juveniles", "juvenil")
+        .trim();
+
+    categorias.forEach(categoria => {
+        const existe = Array.from(select.options).some(
+            opcion => normalizar(opcion.value) === normalizar(categoria)
+        );
+
+        if (!existe) {
+            const opcion = document.createElement("option");
+            opcion.value = categoria;
+            opcion.textContent = categoria;
+            select.appendChild(opcion);
+        }
+    });
 }
 
 function renderTabla(data) {
@@ -537,7 +571,7 @@ function verSuplentes(idPresentacion) {
             const nombrePresentacion = data.datos[0].nombre_presentacion || "Presentación";
 
             const html = data.datos.map(s => `
-                <div style="text-align:left; margin-bottom:14px; padding:12px; border:1px solid rgba(0,255,255,0.25); border-radius:10px;">
+                    <div class="suplente-tarjeta">
                     <strong>Suplente ${s.orden_suplente}</strong><br>
                     <b>Nombre:</b> ${s.nombre} ${s.apellido}<br>
                     <b>Categoría:</b> ${s.nombre_categoria}<br>
@@ -551,9 +585,12 @@ function verSuplentes(idPresentacion) {
             Swal.fire({
                 icon: "info",
                 title: `Suplentes de ${nombrePresentacion}`,
-                html: `<div style="max-height:420px; overflow-y:auto;">${html}</div>`,
+                html: `<div class="suplentes-lista">${html}</div>`,
                 width: 800,
-                confirmButtonText: "Cerrar"
+                confirmButtonText: "Cerrar",
+                customClass: {
+                    popup: "swal-suplentes"
+                }
             });
         })
         .catch(error => {
@@ -561,6 +598,7 @@ function verSuplentes(idPresentacion) {
             Swal.fire("Error", "No se pudieron cargar los suplentes.", "error");
         });
 }
+
 
 function consultarSaturacionIntegrantes() {
     fetch("../php/consultar_saturacion_integrantes.php")
@@ -575,21 +613,31 @@ function consultarSaturacionIntegrantes() {
                 return;
             }
 
-            if (!data.integrantes || data.integrantes.length === 0) {
+            if (!Array.isArray(data.integrantes) || data.integrantes.length === 0) {
                 Swal.fire({
                     icon: "info",
-                    title: "Saturación de integrantes",
+                    title: "Estado de saturación",
                     text: "No existen integrantes registrados para evaluar."
                 });
                 return;
             }
 
+            const normalizar = texto => String(texto ?? "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase()
+                .trim();
+
+            const categoriaClave = texto => {
+                const valor = normalizar(texto);
+                return valor === "juveniles" ? "juvenil" : valor;
+            };
+
             const ordenCategoria = {
-                "Niños": 1,
-                "Juvenil": 2,
-                "Juveniles": 2,
-                "Aspirantes": 3,
-                "Elenco Oficial": 4
+                "ninos": 1,
+                "juvenil": 2,
+                "aspirantes": 3,
+                "elenco oficial": 4
             };
 
             const ordenEstado = {
@@ -598,106 +646,274 @@ function consultarSaturacionIntegrantes() {
                 "sin_asignaciones": 3
             };
 
-            const integrantesOrdenados = [...data.integrantes].sort((a, b) => {
-                const categoriaA = ordenCategoria[a.categoria] || 99;
-                const categoriaB = ordenCategoria[b.categoria] || 99;
+            const integrantes = [...data.integrantes].sort((a, b) => {
+                const catA = ordenCategoria[categoriaClave(a.categoria)] ?? 99;
+                const catB = ordenCategoria[categoriaClave(b.categoria)] ?? 99;
 
-                if (categoriaA !== categoriaB) return categoriaA - categoriaB;
+                if (catA !== catB) return catA - catB;
 
-                const estadoA = ordenEstado[a.estado_saturacion] || 99;
-                const estadoB = ordenEstado[b.estado_saturacion] || 99;
+                const estA = ordenEstado[a.estado_saturacion] ?? 99;
+                const estB = ordenEstado[b.estado_saturacion] ?? 99;
 
-                if (estadoA !== estadoB) return estadoA - estadoB;
+                if (estA !== estB) return estA - estB;
 
-                return String(a.nombre_completo || "").localeCompare(String(b.nombre_completo || ""));
+                return String(a.nombre_completo || "").localeCompare(
+                    String(b.nombre_completo || ""), "es"
+                );
             });
 
-            let categoriaActual = "";
-
-            const html = integrantesOrdenados.map(item => {
-                let claseEstado = "saturacion-info";
-                let icono = "fa-circle-info";
-                let estado = "Sin asignaciones activas";
-
-                if (item.estado_saturacion === "normal") {
-                    claseEstado = "saturacion-disponible";
-                    icono = "fa-circle-check";
-                    estado = "Disponible";
-                }
-
-                if (item.estado_saturacion === "saturado") {
-                    claseEstado = "saturacion-alerta";
-                    icono = "fa-triangle-exclamation";
-                    estado = "Saturado";
-                }
-
-                const categoria = item.categoria || "Sin categoría";
-
-                let encabezadoCategoria = "";
-
-                if (categoria !== categoriaActual) {
-                    categoriaActual = categoria;
-
-                    encabezadoCategoria = `
-                        <div class="saturacion-categoria-titulo">
-                            ${renderCategoria(categoria)}
-                        </div>
-                    `;
-                }
-
-                return `
-                    ${encabezadoCategoria}
-
-                    <div class="saturacion-card ${claseEstado}">
-                        <div class="saturacion-card-header">
-                            <div class="saturacion-icono">
-                                <i class="fa-solid ${icono}"></i>
-                            </div>
-
-                            <div>
-                                <h4>${escapeHtml(String(item.nombre_completo || "--"))}</h4>
-                                <span>${estado}</span>
-                            </div>
-                        </div>
-
-                        <div class="saturacion-grid">
-                            <div>
-                                <small>Categoría</small>
-                                <strong>${renderCategoria(categoria)}</strong>
-                            </div>
-
-                            <div>
-                                <small>Presentaciones activas</small>
-                                <strong>${item.total_presentaciones}</strong>
-                            </div>
-
-                            <div>
-                                <small>Jornadas activas</small>
-                                <strong>${item.total_jornadas}</strong>
-                            </div>
-
-                            <div>
-                                <small>Minutos acumulados</small>
-                                <strong>${item.minutos_totales} min</strong>
-                            </div>
-                        </div>
-
-                        <div class="saturacion-motivo">
-                            <small>Motivo</small>
-                            <p>${escapeHtml(String(item.motivo || "--"))}</p>
-                        </div>
-                    </div>
-                `;
-            }).join("");
+            const porPagina = 5;
+            let paginaActual = 1;
 
             Swal.fire({
                 icon: "info",
                 title: "Estado de saturación",
-                html: `<div class="saturacion-modal-lista">${html}</div>`,
                 width: 900,
                 confirmButtonText: "Cerrar",
                 customClass: {
                     popup: "swal-saturacion-suave"
+                },
+                html: `
+                    <div class="saturacion-filtros">
+
+                        <div>
+                            <label for="satBuscar">Buscar integrante</label>
+                            <input
+                                type="text"
+                                id="satBuscar"
+                                placeholder="Nombre o apellido..."
+                                autocomplete="off"
+                            >
+                        </div>
+
+                        <div>
+                            <label for="satCategoria">Categoría</label>
+                            <select id="satCategoria">
+                                <option value="">Todas las categorías</option>
+                                <option value="Niños">Niños</option>
+                                <option value="Juvenil">Juvenil</option>
+                                <option value="Aspirantes">Aspirantes</option>
+                                <option value="Elenco Oficial">Elenco Oficial</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="satPresentaciones">Presentaciones activas</label>
+                            <select id="satPresentaciones">
+                                <option value="">Todas</option>
+                                <option value="0">0 presentaciones</option>
+                                <option value="1">1 presentación</option>
+                                <option value="2">2 presentaciones</option>
+                                <option value="3">3 presentaciones</option>
+                                <option value="4">4 presentaciones</option>
+                                <option value="5">5 presentaciones</option>
+                                <option value="6+">6 o más</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="saturacion-resultados" id="satResultados"></div>
+
+                    <div class="saturacion-modal-lista" id="satLista"></div>
+
+                    <div class="saturacion-paginacion">
+                        <button type="button" id="satAnterior">
+                            <i class="fa-solid fa-chevron-left"></i>
+                            Anterior
+                        </button>
+
+                        <span id="satPagina"></span>
+
+                        <button type="button" id="satSiguiente">
+                            Siguiente
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                `,
+
+                didOpen: popup => {
+                    const buscar = popup.querySelector("#satBuscar");
+                    const filtroCategoria = popup.querySelector("#satCategoria");
+                    const filtroPresentaciones = popup.querySelector("#satPresentaciones");
+                    const lista = popup.querySelector("#satLista");
+                    const resultados = popup.querySelector("#satResultados");
+                    const textoPagina = popup.querySelector("#satPagina");
+                    const anterior = popup.querySelector("#satAnterior");
+                    const siguiente = popup.querySelector("#satSiguiente");
+
+                    function obtenerFiltrados() {
+                        const texto = normalizar(buscar.value);
+                        const categoria = categoriaClave(filtroCategoria.value);
+                        const cantidad = filtroPresentaciones.value;
+
+                        return integrantes.filter(item => {
+                            const nombre = normalizar(item.nombre_completo);
+                            const categoriaItem = categoriaClave(item.categoria);
+                            const total = Number(item.total_presentaciones || 0);
+
+                            const cumpleNombre =
+                                nombre.includes(texto);
+
+                            const cumpleCategoria =
+                                !categoria || categoriaItem === categoria;
+
+                            let cumplePresentaciones = true;
+
+                            if (cantidad === "6+") {
+                                cumplePresentaciones = total >= 6;
+                            } else if (cantidad !== "") {
+                                cumplePresentaciones = total === Number(cantidad);
+                            }
+
+                            return cumpleNombre &&
+                                   cumpleCategoria &&
+                                   cumplePresentaciones;
+                        });
+                    }
+
+                    function generarTarjeta(item) {
+                        let claseEstado = "saturacion-info";
+                        let icono = "fa-circle-info";
+                        let estado = "Sin asignaciones activas";
+
+                        if (item.estado_saturacion === "normal") {
+                            claseEstado = "saturacion-disponible";
+                            icono = "fa-circle-check";
+                            estado = "Disponible";
+                        }
+
+                        if (item.estado_saturacion === "saturado") {
+                            claseEstado = "saturacion-alerta";
+                            icono = "fa-triangle-exclamation";
+                            estado = "Saturado";
+                        }
+
+                        const categoria = item.categoria || "Sin categoría";
+
+                        return `
+                            <div class="saturacion-card ${claseEstado}">
+                                <div class="saturacion-card-header">
+                                    <div class="saturacion-icono">
+                                        <i class="fa-solid ${icono}"></i>
+                                    </div>
+                                    <div>
+                                        <h4>${escapeHtml(String(item.nombre_completo || "--"))}</h4>
+                                        <span>${estado}</span>
+                                    </div>
+                                </div>
+
+                                <div class="saturacion-grid">
+                                    <div>
+                                        <small>Categoría</small>
+                                        <strong>${renderCategoria(categoria)}</strong>
+                                    </div>
+                                    <div>
+                                        <small>Presentaciones activas</small>
+                                        <strong>${Number(item.total_presentaciones || 0)}</strong>
+                                    </div>
+                                    <div>
+                                        <small>Jornadas activas</small>
+                                        <strong>${Number(item.total_jornadas || 0)}</strong>
+                                    </div>
+                                    <div>
+                                        <small>Minutos acumulados</small>
+                                        <strong>${Number(item.minutos_totales || 0)} min</strong>
+                                    </div>
+                                </div>
+
+                                <div class="saturacion-motivo">
+                                    <small>Motivo</small>
+                                    <p>${escapeHtml(String(item.motivo || "--"))}</p>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    function mostrarPagina() {
+                        const filtrados = obtenerFiltrados();
+                        const totalPaginas = Math.max(
+                            1,
+                            Math.ceil(filtrados.length / porPagina)
+                        );
+
+                        paginaActual = Math.min(
+                            Math.max(paginaActual, 1),
+                            totalPaginas
+                        );
+
+                        const inicio = (paginaActual - 1) * porPagina;
+                        const visibles = filtrados.slice(
+                            inicio,
+                            inicio + porPagina
+                        );
+
+                        resultados.textContent =
+                            `Mostrando ${visibles.length} de ${filtrados.length} integrantes`;
+
+                        if (visibles.length === 0) {
+                            lista.innerHTML = `
+                                <p class="saturacion-sin-resultados">
+                                    No se encontraron integrantes con estos filtros.
+                                </p>
+                            `;
+                        } else {
+                            let categoriaAnterior = "";
+
+                            lista.innerHTML = visibles.map(item => {
+                                const categoria = item.categoria || "Sin categoría";
+                                const clave = categoriaClave(categoria);
+
+                                let encabezado = "";
+
+                                if (clave !== categoriaAnterior) {
+                                    categoriaAnterior = clave;
+
+                                    encabezado = `
+                                        <div class="saturacion-categoria-titulo">
+                                            ${renderCategoria(categoria)}
+                                        </div>
+                                    `;
+                                }
+
+                                return encabezado + generarTarjeta(item);
+                            }).join("");
+                        }
+
+                        textoPagina.textContent =
+                            `Página ${paginaActual} de ${totalPaginas}`;
+
+                        anterior.disabled = paginaActual <= 1;
+                        siguiente.disabled = paginaActual >= totalPaginas;
+                    }
+
+                    buscar.addEventListener("input", () => {
+                        paginaActual = 1;
+                        mostrarPagina();
+                    });
+
+                    filtroCategoria.addEventListener("change", () => {
+                        paginaActual = 1;
+                        mostrarPagina();
+                    });
+
+                    filtroPresentaciones.addEventListener("change", () => {
+                        paginaActual = 1;
+                        mostrarPagina();
+                    });
+
+                    anterior.addEventListener("click", () => {
+                        if (paginaActual > 1) {
+                            paginaActual--;
+                            mostrarPagina();
+                        }
+                    });
+
+                    siguiente.addEventListener("click", () => {
+                        paginaActual++;
+                        mostrarPagina();
+                    });
+
+                    mostrarPagina();
                 }
             });
         })
@@ -711,6 +927,7 @@ function consultarSaturacionIntegrantes() {
             });
         });
 }
+
 
 
 function normalizarCategoriaColor(texto) {

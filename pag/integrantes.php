@@ -49,8 +49,8 @@
 
     
     <a href="auto.php">
-      <i class="fa-solid fa-car"></i>
-      <span>Auto</span>
+      <i class="fa-solid fa-user-check"></i>
+      <span>Asignación Inteligente</span>
     </a>
 
     <a href="detalle_asignacion.php">
@@ -145,8 +145,45 @@
   </div>
  
   <div class="panel-tabla">
-    <h3>Integrantes registrados</h3>
-    <div class="tabla-scroll">
+  <h3>Integrantes registrados</h3>
+
+  <!-- FILTROS DE BÚSQUEDA -->
+  <div class="filtros-integrantes">
+
+    <div class="filtro-item">
+      <label for="buscarIntegrante">Buscar por nombre o apellido</label>
+      <input
+        type="search"
+        id="buscarIntegrante"
+        placeholder="Escriba un nombre o apellido..."
+        autocomplete="off"
+      >
+    </div>
+
+    <div class="filtro-item">
+      <label for="filtroCategoriaIntegrantes">Categoría</label>
+      <select id="filtroCategoriaIntegrantes">
+        <option value="">Todas las categorías</option>
+        <option value="Niños">Niños</option>
+        <option value="Juvenil">Juvenil</option>
+        <option value="Aspirantes">Aspirantes</option>
+        <option value="Elenco Oficial">Elenco Oficial</option>
+      </select>
+    </div>
+
+    <div class="filtro-item">
+      <label for="filtroNivelIntegrantes">Nivel</label>
+      <select id="filtroNivelIntegrantes">
+        <option value="">Todos los niveles</option>
+        <option value="Básico">Básico</option>
+        <option value="Intermedio">Intermedio</option>
+        <option value="Avanzado">Avanzado</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="tabla-scroll">
       <table>
         <thead>
   <tr>
@@ -165,8 +202,36 @@
 <tbody id="tablaIntegrantes"></tbody>
       </table>
     </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="paginacion-integrantes">
+
+      <span id="infoPaginacionIntegrantes">
+        Mostrando 0 de 0 integrantes
+      </span>
+
+      <div class="paginacion-controles">
+
+        <button type="button" id="btnAnteriorIntegrantes">
+          <i class="fa-solid fa-chevron-left"></i>
+          Anterior
+        </button>
+
+        <span id="paginaActualIntegrantes">
+          Página 1 de 1
+        </span>
+
+        <button type="button" id="btnSiguienteIntegrantes">
+          Siguiente
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
- 
+
 </section>
 <script src="../js/sidebar.js"></script>
 <script src="../js/app.js"></script>

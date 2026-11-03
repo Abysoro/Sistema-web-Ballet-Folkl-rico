@@ -23,13 +23,18 @@ function formatearTiempoColas($segundos) {
     $segRestantes = $segundos % 60;
 
     if ($dias > 0) {
-        $texto = $dias . " día(s)";
-        if ($horas > 0) {
-            $texto .= " " . $horas . " h";
-        }
-        return $texto;
+    $texto = $dias . ($dias === 1 ? " día" : " días");
+
+    if ($horas > 0) {
+        $texto .= " " . $horas . " h";
     }
 
+    if ($minutos > 0) {
+        $texto .= " " . $minutos . " min";
+    }
+
+    return $texto;
+}
     if ($horas > 0) {
         $texto = $horas . " h";
         if ($minutos > 0) {
@@ -82,33 +87,50 @@ SELECT
         END
     ) AS longitud_cola,
 
-    AVG(
-        CASE
-            WHEN d.estado_asignacion = 'Asignado'
-                 AND d.fecha_ingreso_cola IS NOT NULL
-                 AND d.fecha_asignacion IS NOT NULL
-            THEN TIMESTAMPDIFF(SECOND, d.fecha_ingreso_cola, d.fecha_asignacion)
+    CASE
+    WHEN p.fecha_registro IS NULL
+         OR p.fecha_registro = '0000-00-00 00:00:00'
+         OR p.capacidad IS NULL
+         OR p.capacidad <= 0
+    THEN NULL
 
-            WHEN d.estado_asignacion = 'En espera'
-                 AND d.fecha_ingreso_cola IS NOT NULL
-                 AND (
-                    p.estado = 'Inactiva'
-                    OR p.fecha < CURDATE()
-                    OR COALESCE(j.estado, '') <> 'Activo'
-                 )
+    WHEN SUM(
+        CASE WHEN d.estado_asignacion = 'Asignado'
+             THEN 1 ELSE 0 END
+    ) >= p.capacidad
+    THEN
+        CASE
+            WHEN SUM(
+                CASE
+                    WHEN d.estado_asignacion = 'Asignado'
+                         AND d.fecha_asignacion IS NOT NULL
+                         AND d.fecha_asignacion <> '0000-00-00 00:00:00'
+                    THEN 1 ELSE 0
+                END
+            ) = SUM(
+                CASE WHEN d.estado_asignacion = 'Asignado'
+                     THEN 1 ELSE 0 END
+            )
+            AND MAX(
+                CASE WHEN d.estado_asignacion = 'Asignado'
+                     THEN d.fecha_asignacion END
+            ) >= p.fecha_registro
             THEN TIMESTAMPDIFF(
                 SECOND,
-                d.fecha_ingreso_cola,
-                CONCAT(p.fecha, ' ', COALESCE(p.hora_presentacion, '23:59:59'))
+                p.fecha_registro,
+                MAX(
+                    CASE WHEN d.estado_asignacion = 'Asignado'
+                         THEN d.fecha_asignacion END
+                )
             )
-
-            WHEN d.estado_asignacion = 'En espera'
-                 AND d.fecha_ingreso_cola IS NOT NULL
-            THEN TIMESTAMPDIFF(SECOND, d.fecha_ingreso_cola, NOW())
-
             ELSE NULL
         END
-    ) AS tiempo_espera_promedio_segundos
+
+    ELSE GREATEST(
+        0,
+        TIMESTAMPDIFF(SECOND, p.fecha_registro, NOW())
+    )
+END AS tiempo_hasta_completar_segundos
 
 FROM presentaciones p
 INNER JOIN categorias c
@@ -120,6 +142,7 @@ LEFT JOIN detalle_asignacion d
 
 GROUP BY
     p.id_presentacion,
+    p.fecha_registro,
     p.nombre_presentacion,
     c.nombre_categoria,
     p.capacidad,
@@ -130,6 +153,11 @@ GROUP BY
     j.estado
 
 HAVING COUNT(d.id_detalle) > 0
+    OR (
+        estado_presentacion = 'Activa'
+        AND p.fecha >= CURDATE()
+        AND estado_jornada = 'Activo'
+    )
 
 ORDER BY
     FIELD(c.nombre_categoria, 'Niños', 'Juvenil', 'Juveniles', 'Aspirantes', 'Elenco Oficial'),
@@ -156,7 +184,7 @@ while ($row = $res->fetch_assoc()) {
     $tasaLlegada = (int)$row["tasa_llegada"];
     $tasaServicio = (int)$row["tasa_servicio"];
     $longitudCola = (int)$row["longitud_cola"];
-    $tiempoPromedio = (int)$row["tiempo_espera_promedio_segundos"];
+    $tiempoCompletar = $row["tiempo_hasta_completar_segundos"];
 
     if ($capacidad > 0) {
         $utilizacion = ($tasaServicio / $capacidad) * 100;
@@ -180,7 +208,9 @@ while ($row = $res->fetch_assoc()) {
         "tasa_llegada" => number_format($tasaLlegada, 2),
         "tasa_servicio" => number_format($tasaServicio, 2),
         "longitud_cola" => $longitudCola,
-        "tiempo_espera_promedio" => formatearTiempoColas($tiempoPromedio),
+        "tiempo_hasta_completar" => $tiempoCompletar === null
+    ? "Sin dato"
+    : formatearTiempoColas((int)$tiempoCompletar),
         "utilizacion_sistema" => number_format($utilizacion, 2) . "%"
     ];
 }

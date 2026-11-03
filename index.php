@@ -60,8 +60,8 @@ $nombreUsuario = $_SESSION['nombre_usuario'] ?? "Usuario";
 
 
     <a href="pag/auto.php">
-      <i class="fa-solid fa-car"></i>
-      <span>Auto</span>
+      <i class="fa-solid fa-user-check"></i>
+      <span>Asignación Inteligente</span>
     </a>
 
     <a href="pag/detalle_asignacion.php">
